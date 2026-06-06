@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Food Store</title>
+  <link rel="stylesheet" href="./home.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <header class="navbar">
+    <div class="logo">🥤 FoodStore</div>
+
+    <input type="text" id="search" placeholder="Buscar producto..." />
+
+    <!-- Carrito -->
+    <a href="/src/pages/store/cart/cart.html" class="cart-link">
+      Carrito 🛒 <span id="cart-count">(0)</span>
+    </a>
+
+    <!-- Favoritos (🔥 FIX: evitar comportamiento raro) -->
+    <button onclick="showFavorites()" class="cart-link favorites-btn">
+  ❤️ Favoritos
+  </button>
+  </header>
+
+  <div class="layout">
+
+    <aside class="sidebar">
+      <h3>Categorías</h3>
+      <button onclick="filterCategory('all')">Todos</button>
+      <button onclick="filterCategory('Licuados')">Licuados</button>
+       <button onclick="filterCategory('Panadería & bakery')">Panadería & bakery</button>
+      <button onclick="filterCategory('Postres')">Postres</button>
+       <button onclick="filterCategory('Cafetería')">Cafetería</button>  
+    </aside>
+
+    <main>
+      <div id="products"></div>
+    </main>
+
+  </div>
+
+  <script type="module" src="./home.ts"></script>
+
+</body>
+</html>
