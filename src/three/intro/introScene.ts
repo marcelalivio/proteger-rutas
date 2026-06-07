@@ -1,203 +1,203 @@
-import * as THREE from "three";
-import { loadCoffee } from "./coffee";
-import { setupSky } from "./clouds";
-import { createSteam } from "./steam";
+function loadPlayfairFont() {
+  if (document.querySelector('link[data-intro-font="playfair"]')) return;
 
-import {
-  EffectComposer,
-  RenderPass,
-  EffectPass,
-  BloomEffect
-} from "postprocessing";
+  const fontLink = document.createElement("link");
+  fontLink.rel = "stylesheet";
+  fontLink.dataset.introFont = "playfair";
+  fontLink.href =
+ "https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap";
+
+  document.head.appendChild(fontLink);
+}
 
 export function createIntroScene() {
+  loadPlayfairFont();
+
   const intro = document.createElement("div");
 
   intro.style.position = "fixed";
   intro.style.inset = "0";
-  intro.style.background = "black";
   intro.style.zIndex = "999999";
   intro.style.overflow = "hidden";
+  intro.style.background = "black";
 
-  // TEXT OVERLAY
+  // VIDEO
+
+  const video = document.createElement("video");
+
+  video.src = "/videos/intro-clouds.mp4";
+  video.autoplay = true;
+  video.loop = true;
+  video.muted = true;
+  video.playsInline = true;
+
+  video.style.position = "absolute";
+  video.style.inset = "0";
+  video.style.width = "100%";
+  video.style.height = "100%";
+  video.style.objectFit = "cover";
+
+  intro.appendChild(video);
+
+  // OVERLAY
+
+  const overlay = document.createElement("div");
+
+  overlay.style.position = "absolute";
+  overlay.style.inset = "0";
+
+  overlay.style.background = `
+    linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.05),
+      rgba(0,0,0,0.45)
+    )
+  `;
+
+  overlay.style.zIndex = "1";
+
+  intro.appendChild(overlay);
+
+  // TEXT WRAPPER
 
   const titleWrap = document.createElement("div");
 
   titleWrap.style.position = "absolute";
-  titleWrap.style.top = "58%";
+  titleWrap.style.top = "50%";
   titleWrap.style.left = "50%";
   titleWrap.style.transform = "translateX(-50%)";
-  titleWrap.style.zIndex = "20";
   titleWrap.style.textAlign = "center";
-  titleWrap.style.pointerEvents = "none";
+  titleWrap.style.pointerEvents = "auto";
+  titleWrap.style.zIndex = "2";
+
+  const enterButton = document.createElement("button");
+
+enterButton.textContent = "INGRESAR";
+
+enterButton.style.marginTop = "40px";
+enterButton.style.padding = "14px 42px";
+enterButton.style.fontSize = "18px";
+enterButton.style.letterSpacing = "3px";
+enterButton.style.border = "1px solid rgba(255,255,255,0.5)";
+enterButton.style.background = "rgba(255,255,255,0.08)";
+enterButton.style.color = "#f5e8d3";
+enterButton.style.cursor = "pointer";
+enterButton.style.backdropFilter = "blur(8px)";
+enterButton.style.borderRadius = "999px";
+enterButton.style.transition = "all .3s ease";
+
+enterButton.onmouseenter = () => {
+  enterButton.style.background = "rgba(255,255,255,0.18)";
+  enterButton.style.transform = "scale(1.05)";
+};
+
+enterButton.onmouseleave = () => {
+  enterButton.style.background = "rgba(255,255,255,0.08)";
+  enterButton.style.transform = "scale(1)";
+};
+
+  // SUBTITLE
 
   const subtitle = document.createElement("div");
-  subtitle.textContent = "Bienvenidos a";
 
-  subtitle.style.fontFamily = "'Playfair Display', serif";
-  subtitle.style.fontSize = "46px";
+  subtitle.textContent = "";
+
+  subtitle.style.fontFamily =
+    "'Playfair Display', serif";
+
+  subtitle.style.fontSize = "42px";
+
   subtitle.style.fontWeight = "500";
-  subtitle.style.color = "#7a5230";
-  subtitle.style.letterSpacing = "1px";
-  subtitle.style.textShadow = `
-    0 2px 8px rgba(255,220,150,0.35),
-    0 0 30px rgba(0,0,0,0.25)
-  `;
+
+  subtitle.style.color = "#ffffff";
+
+  subtitle.style.marginBottom = "10px";
+
+  subtitle.style.textShadow =
+    "0 2px 12px rgba(0,0,0,.5)";
+
+  // TITLE
 
   const title = document.createElement("div");
+
   title.textContent = "Café de día";
 
-  title.style.fontFamily = "'Playfair Display', serif";
-  title.style.lineHeight = "1";
-  title.style.letterSpacing = "1px";
-  title.style.fontSize = "150px";
+  title.style.fontFamily =
+ "'Great Vibes', cursive";
+
+  title.style.fontSize = "130px";
+
   title.style.fontWeight = "800";
-  title.style.color = "#8c5a2c";
-  title.style.textShadow = `
-    0 4px 14px rgba(255,220,150,0.45),
-    0 0 40px rgba(0,0,0,0.2)
-  `;
+
+  title.style.lineHeight = "1";
+
+  title.style.color = "#ffffff";
+
+  title.style.textShadow =
+    "0 4px 30px rgba(0,0,0,.45)";
+
+  title.style.opacity = "0";
+
+  title.style.transform = "translateY(20px)";
+
+  title.style.transition =
+    "all 1.6s cubic-bezier(.22,.61,.36,1)";
 
   titleWrap.appendChild(subtitle);
   titleWrap.appendChild(title);
+  titleWrap.appendChild(enterButton);
 
   intro.appendChild(titleWrap);
+
   document.body.appendChild(intro);
 
-  // THREE SCENE
+  // TYPEWRITER EFFECT
 
-  const scene = new THREE.Scene();
-  setupSky(scene);
+  const text = "Bienvenidos a";
 
-  const camera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    1000
+  let index = 0;
+
+  const typing = setInterval(() => {
+    subtitle.textContent += text[index];
+
+    index++;
+
+    if (index >= text.length) {
+      clearInterval(typing);
+
+      setTimeout(() => {
+        title.style.opacity = "1";
+        title.style.transform = "translateY(0)";
+      }, 500);
+    }
+  }, 90);
+
+  // VIDEO ZOOM CINEMATOGRÁFICO
+
+  video.animate(
+    [
+      {
+        transform: "scale(1)"
+      },
+      {
+        transform: "scale(1.08)"
+      }
+    ],
+    {
+      duration: 12000,
+      iterations: Infinity,
+      direction: "alternate",
+      easing: "ease-in-out"
+    }
   );
 
-camera.position.set(0, 1.2, 8.2);
-camera.lookAt(0, 1.4, 0);
-
-  const renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    alpha: true
-  });
-
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  intro.appendChild(renderer.domElement);
-
-  // LIGHTING
-
-  const ambient = new THREE.AmbientLight(0xffffff, 1.2);
-  scene.add(ambient);
-
-  const keyLight = new THREE.DirectionalLight(0xfff2d6, 3);
-  keyLight.position.set(5, 8, 6);
-  scene.add(keyLight);
-
-  const rimLight = new THREE.DirectionalLight(0xffffff, 2);
-  rimLight.position.set(-6, 4, -5);
-  scene.add(rimLight);
-
-  const fillLight = new THREE.PointLight(0xffd8a8, 2);
-  fillLight.position.set(0, 3, 4);
-  scene.add(fillLight);
-
-  // OBJECTS
-
-  let coffee: THREE.Object3D | null = null;
-  let steam: THREE.Group | null = null;
-
- loadCoffee(scene).then((loadedCoffee) => {
-  coffee = loadedCoffee;
-
-  steam = createSteam();
-  console.log("steam created", steam);
-
-  steam.position.set(0, 5, 0);
-
-  coffee.add(steam);
-  console.log(coffee.children);
-});
-
-  // ANIMATION
-
-  let animationId: number;
-
-  function animate() {
-    animationId = requestAnimationFrame(animate);
-
-    if (coffee) {
-      coffee.rotation.y += 0.01;
-      coffee.position.y =
-         1.6 + Math.sin(Date.now() * 0.001) * 0.08;
-    }
-
-    if (steam) {
-      steam.children.forEach((particle, i) => {
-        particle.position.y += 0.03;
-
-        particle.position.x +=
-          Math.sin(Date.now() * 0.001 + i) * 0.0008;
-
-        const sprite = particle as THREE.Sprite;
-
-        if (sprite.material instanceof THREE.SpriteMaterial) {
-          sprite.material.opacity =
-            0.15 + Math.sin(Date.now() * 0.002 + i) * 0.08;
-        }
-
-        if (particle.position.y > 3.5) {
-          particle.position.y = 0;
-        }
-      });
-    }
-
-    composer.render();
-  }
-
-  animate();
-
-  const composer =
-  new EffectComposer(renderer);
-
-composer.addPass(
-  new RenderPass(scene, camera)
-);
-
-composer.addPass(
-  new EffectPass(
-    camera,
-    new BloomEffect({
-      intensity: 1.5,
-      luminanceThreshold: 0.2,
-      luminanceSmoothing: 0.9
-    })
-  )
-);
-
-  // EXIT
+ function closeIntro() {
+  intro.style.transition = "opacity 1.2s ease";
+  intro.style.opacity = "0";
 
   setTimeout(() => {
-    intro.style.transition = "opacity 1.5s ease";
-    intro.style.opacity = "0";
-
-    setTimeout(() => {
-      cancelAnimationFrame(animationId);
-      renderer.dispose();
-      intro.remove();
-    }, 1500);
-  }, 6000);
-
-
-  // RESPONSIVE
-
-  window.addEventListener("resize", () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
-
-
+    intro.remove();
+  }, 1200);
+}
+  enterButton.addEventListener("click", closeIntro);
 }
